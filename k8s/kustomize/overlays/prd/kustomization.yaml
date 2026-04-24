@@ -1,0 +1,40 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - envs:
+      - config.properties
+    name: miqio-proxy-config
+
+transformers:
+  - labels-transformer.yaml
+
+images:
+  - name: ghcr.io/nicovak/miqio-proxy
+    newTag: 1.0.0
+patches:
+  - patch: |-
+      - op: add
+        path: /metadata/annotations
+        value:
+          avp.kubernetes.io/path: "/secrets-sre/data/miqio-proxy/prd/miqio-proxy"
+    target:
+      kind: Secret
+      name: miqio-proxy-secrets
+      version: v1
+  - patch: |-
+      - op: add
+        path: /metadata/annotations
+        value:
+          avp.kubernetes.io/path: "/secrets-sre/data/miqio-proxy/prd/miqio-proxy-mounted"
+    target:
+      kind: Secret
+      name: miqio-proxy-mounted-secrets
+      version: v1
+  - path: deployment.yaml

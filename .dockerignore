@@ -1,0 +1,15 @@
+*.md
+*.log
+*.txt
+*.out
+*.crt
+.git
+.github
+.go-version
+docs
+examples
+Dockerfile
+bin
+dist
+.env
+*.gz

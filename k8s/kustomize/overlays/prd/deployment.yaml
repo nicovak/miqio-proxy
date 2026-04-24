@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: miqio-proxy
+  labels:
+    app: miqio-proxy
+spec:
+  replicas: 2
+  template:
+    metadata:
+      name: miqio-proxy
+      labels:
+        app: miqio-proxy
+    spec:
+      containers:
+        - name: miqio-proxy
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "100m"
+            limits:
+              memory: "1024Mi"
+              cpu: "1000m"
+  selector:
+    matchLabels:
+      app: miqio-proxy

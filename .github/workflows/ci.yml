@@ -1,0 +1,132 @@
+name: CI
+
+# on:
+#   push:
+#     branches:
+#       - "**"
+#     tags-ignore:
+#       - "*.*"
+
+# env:
+#   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#   NICOVAK_PAT: ${{ secrets.NICOVAK_PAT }}
+#   CI_USER_NAME: ci
+#   CI_USER_EMAIL: ci@miqio.app
+#   GOPRIVATE: github.com/nicovak/miqio-go
+
+# jobs:
+#   check_test:
+#     name: Check, test & lint
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Setup Git
+#         run: |
+#           git config --global url."https://$NICOVAK_PAT:@github.com/".insteadOf "https://github.com/"
+#       - name: Check out code
+#         uses: actions/checkout@v3
+#         with:
+#           fetch-depth: 0
+#           token: ${{ secrets.NICOVAK_PAT }}
+#       - uses: wagoid/commitlint-github-action@v5
+#       - uses: actions/setup-go@v3
+#         with:
+#           go-version: "1.25"
+#       - name: golangci-lint
+#         uses: golangci/golangci-lint-action@v7
+#         with:
+#           version: v2.0
+#           args: --timeout 5m
+#       - name: Set up .env file
+#         run: |
+#           touch .env
+#           echo "ENV=DEV" >> .env
+#           echo "POSTGRES_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/miqio_lp_proxy?sslmode=disable&pool_max_conns=100" >> .env
+#           echo "POSTGRES_TEST_CONNECTION_STRING=postgres://postgres:postgres@localhost:5432/miqio_lp_proxy_test?sslmode=disable&pool_max_conns=100" >> .env
+#           echo "R2_ACCOUNT_ID=test" >> .env
+#           echo "R2_ACCESS_KEY_ID=test" >> .env
+#           echo "R2_SECRET_ACCESS_KEY=test" >> .env
+#           echo "GITHUB_PAT=${NICOVAK_PAT}" >> .env
+#           echo "GOPRIVATE=github.com/nicovak/miqio-go" >> .env
+#       - name: Launching Stack
+#         run: |
+#           docker buildx create --use --driver=docker-container
+#           docker buildx bake -f docker-compose.yaml --set *.cache-to="type=gha,mode=max" --set *.cache-from="type=gha" --load
+#           docker compose up -d
+#       - name: Sleep for 1 minute
+#         uses: jakejarvis/wait-action@master
+#         with:
+#           time: "60s"
+#       - name: Install golang-migrate
+#         run: |
+#           go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+#       - name: Set up gotestfmt
+#         run: |
+#           go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@latest
+#       - name: Setup DBs
+#         run: |
+#           make db-setup
+#       - name: Run tests
+#         run: |
+#           make test
+
+#   prerelease:
+#     needs: [check_test]
+#     name: Pre-release
+#     runs-on: ubuntu-latest
+#     if: ${{ github.ref == 'refs/heads/develop' }}
+#     steps:
+#       - name: Setup Git
+#         run: |
+#           git config --global user.email $CI_USER_EMAIL
+#           git config --global user.name $CI_USER_NAME
+#           git config --global pull.ff only
+#       - name: Check out code
+#         uses: actions/checkout@v3
+#         with:
+#           fetch-depth: 0
+#           token: ${{ secrets.NICOVAK_PAT }}
+#       - name: Git Checkout CI
+#         run: |
+#           git checkout -b ci_processing
+#       - uses: actions/setup-node@v3
+#         with:
+#           node-version: "${{ vars.CI_NODE_VERSION }}"
+#       - uses: imranismail/setup-kustomize@v2
+#         with:
+#           kustomize-version: "4.5.7"
+#       - name: Develop release
+#         run: npx -p conventional-changelog-conventionalcommits -p @semantic-release/changelog -p @semantic-release/git -p @semantic-release/exec -p semantic-release semantic-release
+
+#   release:
+#     needs: [check_test]
+#     name: Release
+#     runs-on: ubuntu-latest
+#     if: ${{ github.ref == 'refs/heads/master' }}
+#     steps:
+#       - name: Setup Git
+#         run: |
+#           git config --global user.email $CI_USER_EMAIL
+#           git config --global user.name $CI_USER_NAME
+#           git config --global pull.ff only
+#       - name: Check out code
+#         uses: actions/checkout@v3
+#         with:
+#           fetch-depth: 0
+#           token: ${{ secrets.NICOVAK_PAT }}
+#       - name: Git Checkout CI
+#         run: |
+#           git checkout -b ci_processing
+#       - uses: actions/setup-node@v3
+#         with:
+#           node-version: "${{ vars.CI_NODE_VERSION }}"
+#       - uses: imranismail/setup-kustomize@v2
+#         with:
+#           kustomize-version: "4.5.7"
+#       - name: Release
+#         run: npx -p conventional-changelog-conventionalcommits -p @semantic-release/changelog -p @semantic-release/git -p @semantic-release/exec -p semantic-release semantic-release
+#       - name: Update back develop
+#         run: |
+#           git checkout develop
+#           git pull origin develop
+#           git merge --no-ff master develop -X theirs -m "chore(merge): auto merge master to develop"
+#           git push origin develop
