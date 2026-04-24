@@ -55,7 +55,7 @@ Copy `.env.example` to `.env` and fill in your values:
 | `MIQIO_PAGE_DOMAIN` | Base domain for tenant subdomains | `miqio.page` |
 | `CACHE_SYNC_INTERVAL` | In-memory cache refresh interval | `30s` |
 | `LOG_LEVEL` | Logging level | `info` |
-| `APP_ORIGIN` | Next.js app URL (tracking forward target) | `https://app.miqio.page` |
+| `APP_ORIGIN` | Next.js app URL (tracking forward target) | `https://miqio.app` |
 
 ## Getting started
 

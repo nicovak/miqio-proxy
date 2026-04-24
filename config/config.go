@@ -21,7 +21,7 @@ type Config struct {
 	MiqioPageDomain   string        `env:"MIQIO_PAGE_DOMAIN" envDefault:"miqio.page"`
 	CacheSyncInterval time.Duration `env:"CACHE_SYNC_INTERVAL" envDefault:"30s"`
 	LogLevel          string        `env:"LOG_LEVEL" envDefault:"info"`
-	AppOrigin         string        `env:"APP_ORIGIN" envDefault:"https://app.miqio.page"`
+	AppOrigin         string        `env:"APP_ORIGIN" envDefault:"https://miqio.app"`
 }
 
 func Get() *Config {
