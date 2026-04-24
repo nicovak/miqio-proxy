@@ -55,6 +55,7 @@ Copy `.env.example` to `.env` and fill in your values:
 | `MIQIO_PAGE_DOMAIN` | Base domain for tenant subdomains | `miqio.page` |
 | `CACHE_SYNC_INTERVAL` | In-memory cache refresh interval | `30s` |
 | `LOG_LEVEL` | Logging level | `info` |
+| `APP_ORIGIN` | Next.js app URL (tracking forward target) | `https://app.miqio.page` |
 
 ## Getting started
 
@@ -147,6 +148,7 @@ aws s3 sync ~/path/to/pages/ s3://miqio-lp-assets/$TENANT_UUID/ \
 |---|---|---|
 | `GET` | `/healthz` | Liveness probe (always 200) |
 | `GET` | `/readyz` | Readiness probe (checks Postgres + R2) |
+| `POST` | `/api/track` | Forward tracking events to Next.js app (Origin/Referer validated) |
 | `GET` | `/` | Serve tenant root page |
 | `GET` | `/*` | Serve tenant subpage |
 

@@ -55,7 +55,7 @@ func Run(srv *Server) {
 	e.Use(middleware.Recover())
 	e.Use(middleware.AccessLog())
 
-	handler.RegisterRoutes(e, srv.Pool, store, srv.R2Client, conf.MiqioPageDomain)
+	handler.RegisterRoutes(e, srv.Pool, store, srv.R2Client, conf.MiqioPageDomain, conf.AppOrigin)
 
 	sigCtx, sigCancel := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	defer sigCancel()
